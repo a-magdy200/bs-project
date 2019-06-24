@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once '../partials/init.php';
 
 
@@ -62,14 +63,19 @@ require_once __DIR__ . '/vendor/autoload.php';
                 'id' => $videoId
             );
 
-            array_push($videos, $video);
             if (!checkDB('videos', 'youtube_id', $videoId))
             {
                 $query = $con->prepare("INSERT INTO `videos` (`youtube_id`,`title`,`description`,`img`) VALUES (?,?,?,?)");
                 $query->execute(array($videoId, $title, $description, $img));
-
+                $video['rating'] = 0;
+            } else {
+                $query = $con->prepare("SELECT average_rating FROM videos WHERE youtube_id=?");
+                $query->execute(array($videoId));
+                $rating = $query->fetchAll(PDO::FETCH_ASSOC)[0]['average_rating'];
+                $video['rating'] = $rating;
             }
-                
+            array_push($videos, $video);
+
         }
 
         $searchResponse = $youtube->search->listSearch('id,snippet', array(
@@ -93,12 +99,19 @@ require_once __DIR__ . '/vendor/autoload.php';
                 'id' => $videoId
             );
             
-            array_push($videos,$video);
             if (!checkDB('videos', 'youtube_id', $videoId))
             {
                 $query = $con->prepare("INSERT INTO `videos` (`youtube_id`,`title`,`description`,`img`) VALUES (?,?,?,?)");
                 $query->execute(array($videoId, $title, $description, $img));
+                $video['rating'] = 0;
+            } else {
+                $query = $con->prepare("SELECT average_rating FROM videos WHERE youtube_id=?");
+                $query->execute(array($videoId));
+                $rating = $query->fetchAll(PDO::FETCH_ASSOC)[0]['average_rating'];
+                $video['rating'] = $rating;
             }
+            array_push($videos,$video);
+
         }
 
     } catch (Google_Service_Exception $e) {
@@ -118,6 +131,9 @@ require_once __DIR__ . '/vendor/autoload.php';
             if ($video['id'] == $_GET['id']) {
                 $current_video = $video;
                 array_splice($videos, $i, 1);
+                $query2 = $con->prepare("SELECT * FROM `videos` WHERE youtube_id = ?");
+                $query2->execute(array($current_video['id']));
+                $ajax_id = $query2->fetchAll(PDO::FETCH_ASSOC)[0]['id'];
                 break;
             }
             $i++;
@@ -136,24 +152,59 @@ require_once __DIR__ . '/vendor/autoload.php';
                     <b><h4><?php echo $current_video['title'];?></h4></b>
                     <?php if (isset($_SESSION['user'])) { ?>
                     <div>
-                        <div class="rating">
-                            <span class="rating-star" data-value="5"></span>
-                            <span class="rating-star" data-value="4"></span>
-                            <span class="rating-star" data-value="3"></span>
-                            <span class="rating-star" data-value="2"></span>
-                            <span class="rating-star" data-value="1"></span>
-                        </div>
-
+                        <?php
+                            $query3 = $con->prepare("SELECT * FROM `user_rating_videos` WHERE user_id=? AND video_id=?");
+                            $query3->execute(array($_SESSION['user']['id'], $ajax_id));
+                            $user_rated = $query3->rowCount() > 0;
+                            if ($user_rated) {
+                                $rating = $query3->fetchAll(PDO::FETCH_ASSOC)[0]['rating'];
+                                ?>
+                                    <div class="rating">
+                                <?php for ($i = 0; $i < $rating; $i++) {?>
+                                        <i class="fa fa-star"></i>
+                                <?php } ?>
+                                <?php for ($i = $rating; $i < 5; $i++) {?>
+                                    <i class="fa fa-star-o"></i>
+                                <?php } ?>
+                                    </div>
+                            <?php } else { ?>
+                                <div class="rating">
+                                    <i class="fa  rating-star" data-value="5"></i>
+                                    <i class="fa  rating-star" data-value="4"></i>
+                                    <i class="fa  rating-star" data-value="3"></i>
+                                    <i class="fa  rating-star" data-value="2"></i>
+                                    <i class="fa  rating-star" data-value="1"></i>
+                                </div>
+                        <?php } ?>
+                        <?php if (!$user_rated) { ?>
                         <script>
                         document.body.onload = function () {
-                            $('.rating-star').click(function() {
+                            const video_id = "<?php echo $ajax_id;?>";
+                            const user_id = "<?php echo $_SESSION['user']['id'];?>";
+                            const send_url = "<?php echo $server_base?>/partials/ajax.php";
+                            $('.rating-star').one( "click", function() {
                                 $(this).parents('.rating').find('.rating-star').removeClass('checked');
                                 $(this).addClass('checked');
 
-                                var submitStars = $(this).attr('data-value');
+                                const rating = parseInt($(this).attr('data-value'), 10);
+                                //ajax call
+                                $.post(send_url, {
+                                    video_id, user_id, rating, type: "ajax", action: "rating"
+                                }).done( result => {
+                                    console.log(result);
+                                    $(".rating-star").each(i => {
+                                        if (i < rating) {
+                                            $(".rating-star").eq(i).addClass("fa-star");
+                                        } else {
+                                            $(".rating-star").eq(i).addClass("fa-star-o");
+                                        }
+                                    });
+                                    $(".rating-star").removeClass("rating-star");
+                                } );
                             });
                         };
                         </script>
+                        <?php } ?>
                     </div>
                     <?php } ?>
                 </div>
@@ -167,6 +218,11 @@ require_once __DIR__ . '/vendor/autoload.php';
 <?php } ?>
     <h2 class="text-center" style="padding:10px 0 15px 0">Results for word: <strong><?php echo $query_search;?></strong></h2>
     <?php
+    $rating = array();
+    foreach ($videos as $key => $video) {
+        $rating[$key] = $video['rating'];
+    }
+    array_multisort($rating, SORT_DESC, $videos);
     foreach($videos as $video) {
         includeFileWithVariables("../partials/video-row-template.php", array(
             "id" => $video['id'],

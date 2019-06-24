@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Second Meta is Internet Explorer Compatibility and second is Third Mobile Meta -->
     <link rel="stylesheet" href="<?php echo $styles_path; ?>/bootstrap.css">
+    <link rel="stylesheet" href="<?php echo $styles_path; ?>/font-awesome.min.css">
     <link rel="stylesheet" href="<?php echo $styles_path; ?>/style.css">
     <?php if (isset($styles)) { ?>
         <?php foreach($styles as $style) { ?>

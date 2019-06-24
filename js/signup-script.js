@@ -5,6 +5,7 @@ document.body.onload = function () {
         handleSubmit(e, form);
     });
     $("#signup-btn").on("click", e => {
+        $(".alert.alert-danger").remove();
         handleSubmit(e, form);
     });
 };
@@ -17,7 +18,10 @@ function handleSubmit(e, form) {
             form.before("<div class='alert alert-danger'>" + error + "</div>");
         });
         e.preventDefault();
+        console.log(errors);
     }
+    e.preventDefault();
+    console.log("ss");
 }
 
 function validateForm(form) {

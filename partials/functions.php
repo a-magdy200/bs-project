@@ -5,22 +5,33 @@ function checkDB($table,$col,$item) {
     $query->execute(array($item));
     return $query->rowCount() > 0;
 }
-function onVideoRating($id, $user_rating) {
+function onVideoRating($video_id, $user_id, $user_rating) {
 
     global $con;
     //Get Current Video Data
-    $query = $con->prepare("SELECT * FROM `videos` WHERE id=?");
-    $query->execute(array($id));
-    $video_data = $query->fetch(PDO::FETCH_ASSOC)[0];
-    //Calculate New Values
-    $total_rating_count = $video_data['total_rating_count'] + 1;
-    $total_rating = $video_data['total_rating'] + $user_rating;
-    $new_average_rating = $total_rating / $total_rating_count;
-    //Update Video Data
-    $query = $con->prepare("UPDATE `videos` SET `total_rating_count`=?, `total_rating`=?, `average_rating`=? WHERE `id`=?");
-    $query->execute(array($total_rating_count, $total_rating, $new_average_rating, $id));
+    $query2 = $con->prepare("SELECT * FROM `user_rating_videos` WHERE `user_id`=? AND `video_id`=?");
+    $query2->execute(array($user_id, $video_id));
 
-    return $query->rowCount() > 0;
+    if ($query2->rowCount() == 0) {
+
+        $query = $con->prepare("SELECT * FROM `videos` WHERE id=?");
+        $query->execute(array($video_id));
+        $video_data = $query->fetchAll(PDO::FETCH_ASSOC)[0];
+        //Calculate New Values
+        $total_rating_count = $video_data['total_rating_count'] + 1;
+        $total_rating = $video_data['total_rating'] + $user_rating;
+        $new_average_rating = $total_rating / $total_rating_count;
+        //Update Video Data
+        $query = $con->prepare("UPDATE `videos` SET `total_rating_count`=?, `total_rating`=?, `average_rating`=? WHERE `id`=?");
+        $query->execute(array($total_rating_count, $total_rating, $new_average_rating, $video_id));
+
+        $query3 = $con->prepare("INSERT INTO `user_rating_videos` (`user_id`,`video_id`,`rating`) VALUES (?,?,?)");
+        $query3->execute(array($user_id, $video_id, $user_rating));
+        return array("success" => $query->rowCount() > 0 && $query3->rowCount() > 0);
+    } else {
+        return array("success" => false, "error" => "Already Exists.");
+    }
+
 }
 function upload_files($file, $type) {
     if ($type == "image") {
@@ -113,4 +124,23 @@ function get_categories_info()
 function includeFileWithVariables($fileName, $variables) {
     extract($variables);
     include($fileName);
+}
+function sortVideos($array) {
+/*Method 1*/
+    $rating = array();
+    foreach ($array as $key => $video) {
+        $rating[$key] = $video['rating'];
+    }
+    array_multisort($rating, SORT_DESC, $array);
+/*Method 2*/
+    usort($array, function ($a, $b) {
+        if ($a['rating'] == $b['rating']) {
+            return 0;
+        } else if ($a['rating'] > $b['rating']) {
+            return -1;
+        } else {
+            return 1;
+        }
+    });
+    return $array;
 }

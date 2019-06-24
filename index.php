@@ -58,8 +58,8 @@ session_start();
 			    	    	</p>
 			    	    </div>`
 						<div style="position: absolute;top:-250px; left:210px;width: 400px;">
-							<button type="button" class="btn btn-warning btn-lg btn-block" onclick="location.href='signup.html'" >Sign Up</button>
-							<button type="button" class="btn btn-default btn-lg btn-block" onclick="location.href='login.html'">Log In</button>
+							<button type="button" class="btn btn-warning btn-lg btn-block" onclick="location.href='signup.php'" >Sign Up</button>
+							<button type="button" class="btn btn-default btn-lg btn-block" onclick="location.href='login.php'">Log In</button>
 						</div>
 			    	</div>
 			    </div>
