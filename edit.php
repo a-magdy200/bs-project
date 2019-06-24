@@ -16,12 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $bio = filter_var($_POST['bio'], FILTER_SANITIZE_STRING);
     $id = $_SESSION['user']['id'];
     if ($_FILES['img']["name"] != "") {
-        $file_upload = upload_files($_FILES['img']);
+        $file_upload = upload_files($_FILES['img'], "image");
         $img = $file_upload;
     } else {
         $img = $_SESSION['user']['profile_picture'];
     }
-    $query = $con->prepare("UPDATE `user` SET `fname`=?,`lname`=?,`bio`=?, `img`=? WHERE id=?");
+    $query = $con->prepare("UPDATE `users` SET `fname`=?,`lname`=?,`bio`=?, `img`=? WHERE id=?");
     $query->execute(array($fname, $lname, $bio, $img, $id));
     if ($query->rowCount() > 0) {
         $_SESSION['user'] = array(

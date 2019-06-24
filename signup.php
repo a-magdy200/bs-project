@@ -22,7 +22,7 @@ if (isset($error)) {unset($error);}
             $lname = filter_var($_POST['lname'], FILTER_SANITIZE_STRING);
             $password = sha1($_POST['pass']);
             $file_upload = upload_files($_FILES['img'], "image");
-            $img = $file_upload ? $file_upload : "images/Anon.png";
+            $img = is_string($file_upload) ? $file_upload : "images/Anon.png";
             $query = $con->prepare("INSERT INTO `users` (`fname`,`lname`, `email`, `password`, `img`) VALUES (?,?,?,?,?)");
             $query->execute(array($fname, $lname, $email, $password, $img));
             if ($query->rowCount() > 0) {
@@ -68,7 +68,7 @@ if (isset($error)) {unset($error);}
 <!--                    </div>-->
 <!--                </div>-->
                 <div class="col-xs-8 col-xs-offset-2">
-                    <form id="registerForm" style="border:5px; margin-top: 120px;" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
+                    <form id="registerForm" style="border:5px; margin-top: 120px;" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>" enctype="multipart/form-data">
                         <div class="form-group">
                             <label for="exampleInputName1">First name</label>
                             <input required type="text" name="fname" class="form-control" id="exampleInputName1" placeholder="First Name">

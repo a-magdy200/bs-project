@@ -18,10 +18,7 @@ function handleSubmit(e, form) {
             form.before("<div class='alert alert-danger'>" + error + "</div>");
         });
         e.preventDefault();
-        console.log(errors);
     }
-    e.preventDefault();
-    console.log("ss");
 }
 
 function validateForm(form) {

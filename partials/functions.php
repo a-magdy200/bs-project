@@ -43,7 +43,7 @@ function upload_files($file, $type) {
         $target_dir = "uploads/videos/";
         $max_size = 100000000;
     }
-    $target_file = $target_dir . basename($file["name"]);
+    $target_file = $target_dir ."_". time() ."_". basename($file["name"]);
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
     // Check if image file is a actual image or fake image
@@ -58,6 +58,7 @@ function upload_files($file, $type) {
         }
     }
     // Check if file already exists
+    // Never True statement
     if (file_exists($target_file)) {
         echo "Sorry, file already exists.";
         $uploadOk = 0;
