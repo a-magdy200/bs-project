@@ -13,7 +13,7 @@ require_once "partials/headers.php";
         .profile-userpic {
             margin-bottom: 20px;
         }
-        button {
+        .profile-sidebar button {
             margin:10px;
         }
     </style>
