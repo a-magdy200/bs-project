@@ -9,6 +9,14 @@ $user = $_SESSION['user'];
 $title = "profile";
 require_once "partials/headers.php";
 ?>
+    <style>
+        .profile-userpic {
+            margin-bottom: 20px;
+        }
+        button {
+            margin:10px;
+        }
+    </style>
 <div class="container" style="margin-top: 70px;">
     <div class="row profile">
         <div class="col-md-3">
@@ -20,9 +28,7 @@ require_once "partials/headers.php";
                 <!-- END SIDEBAR USERPIC -->
                 <!-- SIDEBAR USER TITLE -->
                 <div class="profile-usertitle">
-                    <div class="profile-usertitle-name">
-                        <?php echo ucfirst($user["first_name"]) . " " . ucfirst($user["last_name"]);?>
-                    </div>
+                    <h3 class="profile-usertitle-name"><?php echo ucfirst($user["first_name"]) . " " . ucfirst($user["last_name"]);?></h3>
                     <div style="margin: 10px;">
                     <div class="rating">
                         <span class="rating-star" data-value="5"></span>
@@ -45,7 +51,7 @@ require_once "partials/headers.php";
                 </div>
                     <div class="profile-usertitle-job">
                         <b >Bio:</b>
-                        <div class="well" style="padding: 10px; margin:10px;"><?php echo $user['bio'];?></div>
+                        <div class="well" style="padding: 10px; margin:10px;"><?php echo strlen($user['bio']) > 0 ? $user['bio'] : "No Bio Added.";?></div>
                     </div>
                 </div>
                 <!-- END SIDEBAR USER TITLE -->
