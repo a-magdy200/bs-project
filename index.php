@@ -1,7 +1,8 @@
-<?php require_once "partials/init.php";
+<?php
+session_start();
+require_once "partials/init.php";
 $title = "homepage";
 require_once "partials/headers.php";
-session_start();
 ?>
 
 		<!--Start Carousel-->
@@ -30,10 +31,12 @@ session_start();
 			    	    		A community of dedicated learners.
 			    	    	</p>
 			    	    </div>
+                        <?php if (!isset($_SESSION['user'])) { ?>
 						<div style="position: absolute;top:-250px; left:210px;width: 400px;">
 							<button type="button" class="btn btn-warning btn-lg btn-block" onclick="location.href='signup.php'">Sign Up</button>
 							<button type="button" class="btn btn-default btn-lg btn-block" onclick="location.href='login.php'">Log In</button>
-						</div>		    	    
+						</div>
+                        <?php } ?>
 			    	</div>
 			    </div>
 			    <div class="item">
@@ -57,10 +60,12 @@ session_start();
 			    	    		join to our community.
 			    	    	</p>
 			    	    </div>`
+                        <?php if (!isset($_SESSION['user'])) { ?>
 						<div style="position: absolute;top:-250px; left:210px;width: 400px;">
 							<button type="button" class="btn btn-warning btn-lg btn-block" onclick="location.href='signup.php'" >Sign Up</button>
 							<button type="button" class="btn btn-default btn-lg btn-block" onclick="location.href='login.php'">Log In</button>
 						</div>
+                        <?php } ?>
 			    	</div>
 			    </div>
 			</div>

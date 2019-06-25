@@ -1,5 +1,5 @@
 <?php
-$DEVELOPER_KEY = 'AIzaSyB4TctaESSFCulbfTwHNpKwIkSNn4HAP54';
+$DEVELOPER_KEY = 'AIzaSyDkLFRZ9JKHt3i1Kd1mH8BmWveuluSblv4';
 require_once 'connect.php';
 require_once 'functions.php';
 $server_base = "http://".$_SERVER['SERVER_NAME']."/bs";
