@@ -63,14 +63,30 @@ require_once "partials/headers.php";
                 <?php
                 $query = $con->prepare("SELECT * FROM `videos` WHERE `user_upload_id`=?");
                 $query->execute(array($user['id']));
-                if ($query->rowCount() > 0) {
+                if ($query->rowCount() > 0) {?>
+                    <style>
+                        .profile-video {
+                            margin-bottom: 20px;
+                            padding:15px;
+                        }
+                        .profile-video:not(:last-of-type) {
+                            border-bottom:1px solid #444;
+                        }
+                        .video-heading {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+                    </style>
+                <?php
                     $videos = $query->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($videos as $video) {
-                        includeFileWithVariables("partials/video-row-template.php", array(
+                        includeFileWithVariables("partials/video-profile-template.php", array(
                             "id" => $video['id'],
                             "title" => $video['title'],
                             "description" => $video['description'],
-                            "img" => $video['img']
+                            "url" => $video['video_link'],
+                            "category" => $video['category']
                         ));
                     }
                 } else {
